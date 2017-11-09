@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+        Used in ActionBar and in Android Manifest
+    -->
+    <string name="app_name">Sunshine</string>
+
+    <!--
+        "action" denotes that this string will be used as the label for an Action, from the action
+        bar (by convention)
+    -->
+    <string name="action_settings">Settings</string>
+
+    <!-- Menu label to fetch updated weather info from server -->
+    <string name="action_refresh" translatable="false">Refresh</string>
+
+</resources>
