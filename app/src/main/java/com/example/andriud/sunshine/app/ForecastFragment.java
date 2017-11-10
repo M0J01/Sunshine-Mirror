@@ -16,8 +16,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,7 +59,7 @@ public class ForecastFragment extends Fragment {
         int id = item.getItemId();
         if (id == R.id.action_refresh){
             FetchWeatherTask weatherTask = new FetchWeatherTask();
-            weatherTask.execute("94043");
+            weatherTask.execute("23116");
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -79,8 +81,7 @@ public class ForecastFragment extends Fragment {
         };
         List<String> weekForecast = new ArrayList<String>(Arrays.asList(data));
 
-        // Now create an Array Adapter to take data from a soucre and populated a ListView
-
+        // Now create an Array Adapter to take data from a source and populated a ListView
         mForecastAdapter =
                 new ArrayAdapter<String>(
                         getActivity(),
@@ -93,10 +94,17 @@ public class ForecastFragment extends Fragment {
         // Grab reference to ListView and attach adapter to it
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(mForecastAdapter);
+        // Add a touch/click listener to watch for touch events on our items.
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l){
+                String forecast = mForecastAdapter.getItem(position);
+                Toast.makeText(getActivity(), forecast, Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return rootView;
     }
-
 
     // Extends AsyncTask so that it can be done off main thread
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
@@ -120,16 +128,27 @@ public class ForecastFragment extends Fragment {
         }
 
 
-        /** Take in Weather JSON string, pull out needed data
-         * @param forecastJsonStr, numDays
+        /**Take in Weather JSON string, pull out needed data
+         *
+         * @param forecastJsonStr
+         * @param numDays
          * @return
+         * @throws JSONException
+         *
+         * Example Webaddress
+         * http://api.openweathermap.org/data/2.5/forecast?q=94043&mode=json&units=metric&cnt=7&APPID=5608746ddb3ba819e551b07cb12c82fa
+         * Example JSON Data
+         * {"cod":"200","message":0.3296,"cnt":7,"list":[{"dt":1510272000,"main":{"temp":17.25,"temp_min":15.25,"temp_max":17.25,"pressure":992.41,"sea_level":1030.84,"grnd_level":992.41,"humidity":80,"temp_kf":2},"weather":[{"id":801,"main":"Clouds","description":"few clouds","icon":"02n"}],"clouds":{"all":24},"wind":{"speed":1.11,"deg":235.502},"rain":{},"sys":{"pod":"n"},"dt_txt":"2017-11-10 00:00:00"},{"dt":1510282800,"main":{"temp":10.42,"temp_min":8.92,"temp_max":10.42,"pressure":993,"sea_level":1031.64,"grnd_level":993,"humidity":95,"temp_kf":1.5},"weather":[{"id":802,"main":"Clouds","description":"scattered clouds","icon":"03n"}],"clouds":{"all":36},"wind":{"speed":1.02,"deg":225.001},"rain":{},"sys":{"pod":"n"},"dt_txt":"2017-11-10 03:00:00"},{"dt":1510293600,"main":{"temp":7.03,"temp_min":6.02,"temp_max":7.03,"pressure":993.75,"sea_level":1032.33,"grnd_level":993.75,"humidity":93,"temp_kf":1},"weather":[{"id":802,"main":"Clouds","description":"scattered clouds","icon":"03n"}],"clouds":{"all":44},"wind":{"speed":0.96,"deg":174.5},"rain":{},"sys":{"pod":"n"},"dt_txt":"2017-11-10 06:00:00"},{"dt":1510304400,"main":{"temp":5.8,"temp_min":5.3,"temp_max":5.8,"pressure":993.27,"sea_level":1032.1,"grnd_level":993.27,"humidity":94,"temp_kf":0.5},"weather":[{"id":803,"main":"Clouds","description":"broken clouds","icon":"04n"}],"clouds":{"all":56},"wind":{"speed":1.02,"deg":200.002},"rain":{},"sys":{"pod":"n"},"dt_txt":"2017-11-10 09:00:00"},{"dt":1510315200,"main":{"temp":6.78,"temp_min":6.78,"temp_max":6.78,"pressure":992.94,"sea_level":1031.72,"grnd_level":992.94,"humidity":96,"temp_kf":0},"weather":[{"id":500,"main":"Rain","description":"light rain","icon":"10n"}],"clouds":{"all":68},"wind":{"speed":0.71,"deg":153},"rain":{"3h":0.025},"sys":{"pod":"n"},"dt_txt":"2017-11-10 12:00:00"},{"dt":1510326000,"main":{"temp":7.66,"temp_min":7.66,"temp_max":7.66,"pressure":992.74,"sea_level":1031.62,"grnd_level":992.74,"humidity":99,"temp_kf":0},"weather":[{"id":500,"main":"Rain","description":"light rain","icon":"10d"}],"clouds":{"all":64},"wind":{"speed":0.79,"deg":132},"rain":{"3h":0.050000000000001},"sys":{"pod":"d"},"dt_txt":"2017-11-10 15:00:00"},{"dt":1510336800,"main":{"temp":13.46,"temp_min":13.46,"temp_max":13.46,"pressure":993.2,"sea_level":1031.77,"grnd_level":993.2,"humidity":90,"temp_kf":0},"weather":[{"id":500,"main":"Rain","description":"light rain","icon":"10d"}],"clouds":{"all":48},"wind":{"speed":1.16,"deg":243.508},"rain":{"3h":0.09},"sys":{"pod":"d"},"dt_txt":"2017-11-10 18:00:00"}],"city":{"id":5375480,"name":"Mountain View","coord":{"lat":37.3861,"lon":-122.0839},"country":"US"}}
          */
         private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
+
+
             throws JSONException {
 
             final String OWM_LIST = "list";
             final String OWM_WEATHER = "weather";
-            final String OWM_TEMPERATURE = "temp";
+            //final String OWM_TEMPERATURE = "temp";
+            final String OWM_TEMPERATURE = "main";
             final String OWM_MAX = "temp_max";
             final String OWM_MIN = "temp_min";
             final String OWM_DESCRIPTION = "main";
@@ -281,6 +300,17 @@ public class ForecastFragment extends Fragment {
             }
 
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(String[] result) {
+            if (result!= null){
+                mForecastAdapter.clear();
+                // Can perform add all on honeycomb or better
+                for(String dayForecastStr : result){
+                    mForecastAdapter.add(dayForecastStr);
+                }
+            }
         }
     }
 }

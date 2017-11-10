@@ -14,5 +14,6 @@
 
     <!-- Menu label to fetch updated weather info from server -->
     <string name="action_refresh" translatable="false">Refresh</string>
+    <string name="title_activity" translatable="false">DetailActivity</string>
 
 </resources>
