@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     tools:context="com.example.andriud.sunshine.app.DetailActivity"
     tools:ignore="MergeRootFrame"
+    android:id="@+id/container"
     />
 
 

@@ -16,6 +16,10 @@
 
     <!-- Menu label to fetch updated weather info from server -->
     <string name="action_refresh" translatable="false">Refresh</string>
-    <string name="title_activity_detail" translatable="false">DetailActivity</string>
+    <string name="title_activity_detail" translatable="false">Details</string>
+    <string name="title_activity_settings" translatable="false">Settings</string>
+    <string name="pref_location_label" translatable="false">Location</string>
+    <string name="pref_location_key" translatable="false">location</string>
+    <string name="pref_location_default" translatable="false">23116</string>
 
 </resources>

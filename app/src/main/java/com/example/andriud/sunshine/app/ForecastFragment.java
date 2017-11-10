@@ -4,9 +4,12 @@ package com.example.andriud.sunshine.app;
  * Created by M0J0 on 11/8/2017.
  */
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
 import android.util.Log;
@@ -19,7 +22,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,6 +49,7 @@ public class ForecastFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);    // Ensure that an options menu is created
+        updateWeather();
     }
 
     @Override
@@ -54,12 +57,24 @@ public class ForecastFragment extends Fragment {
         inflater.inflate(R.menu.forecastfragment, menu);
     }
 
+    private void updateWeather(){
+        FetchWeatherTask weatherTask = new FetchWeatherTask();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = prefs.getString(getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default)); //getString (type, string)
+        weatherTask.execute(location);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_refresh){
-            FetchWeatherTask weatherTask = new FetchWeatherTask();
-            weatherTask.execute("23116");
+            //FetchWeatherTask weatherTask = new FetchWeatherTask();
+            //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity()); // Loading up our shared preferences
+            //String location = prefs.getString(getString(R.string.pref_location_key),        // and using them to extract our prefered location key
+             //       getString(R.string.pref_location_default));
+            //weatherTask.execute(location);
+            updateWeather();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -99,7 +114,10 @@ public class ForecastFragment extends Fragment {
 
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l){
                 String forecast = mForecastAdapter.getItem(position);
-                Toast.makeText(getActivity(), forecast, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), DetailActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, forecast);
+                startActivity(intent);
+                //Toast.makeText(getActivity(), forecast, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -141,7 +159,6 @@ public class ForecastFragment extends Fragment {
          * {"cod":"200","message":0.3296,"cnt":7,"list":[{"dt":1510272000,"main":{"temp":17.25,"temp_min":15.25,"temp_max":17.25,"pressure":992.41,"sea_level":1030.84,"grnd_level":992.41,"humidity":80,"temp_kf":2},"weather":[{"id":801,"main":"Clouds","description":"few clouds","icon":"02n"}],"clouds":{"all":24},"wind":{"speed":1.11,"deg":235.502},"rain":{},"sys":{"pod":"n"},"dt_txt":"2017-11-10 00:00:00"},{"dt":1510282800,"main":{"temp":10.42,"temp_min":8.92,"temp_max":10.42,"pressure":993,"sea_level":1031.64,"grnd_level":993,"humidity":95,"temp_kf":1.5},"weather":[{"id":802,"main":"Clouds","description":"scattered clouds","icon":"03n"}],"clouds":{"all":36},"wind":{"speed":1.02,"deg":225.001},"rain":{},"sys":{"pod":"n"},"dt_txt":"2017-11-10 03:00:00"},{"dt":1510293600,"main":{"temp":7.03,"temp_min":6.02,"temp_max":7.03,"pressure":993.75,"sea_level":1032.33,"grnd_level":993.75,"humidity":93,"temp_kf":1},"weather":[{"id":802,"main":"Clouds","description":"scattered clouds","icon":"03n"}],"clouds":{"all":44},"wind":{"speed":0.96,"deg":174.5},"rain":{},"sys":{"pod":"n"},"dt_txt":"2017-11-10 06:00:00"},{"dt":1510304400,"main":{"temp":5.8,"temp_min":5.3,"temp_max":5.8,"pressure":993.27,"sea_level":1032.1,"grnd_level":993.27,"humidity":94,"temp_kf":0.5},"weather":[{"id":803,"main":"Clouds","description":"broken clouds","icon":"04n"}],"clouds":{"all":56},"wind":{"speed":1.02,"deg":200.002},"rain":{},"sys":{"pod":"n"},"dt_txt":"2017-11-10 09:00:00"},{"dt":1510315200,"main":{"temp":6.78,"temp_min":6.78,"temp_max":6.78,"pressure":992.94,"sea_level":1031.72,"grnd_level":992.94,"humidity":96,"temp_kf":0},"weather":[{"id":500,"main":"Rain","description":"light rain","icon":"10n"}],"clouds":{"all":68},"wind":{"speed":0.71,"deg":153},"rain":{"3h":0.025},"sys":{"pod":"n"},"dt_txt":"2017-11-10 12:00:00"},{"dt":1510326000,"main":{"temp":7.66,"temp_min":7.66,"temp_max":7.66,"pressure":992.74,"sea_level":1031.62,"grnd_level":992.74,"humidity":99,"temp_kf":0},"weather":[{"id":500,"main":"Rain","description":"light rain","icon":"10d"}],"clouds":{"all":64},"wind":{"speed":0.79,"deg":132},"rain":{"3h":0.050000000000001},"sys":{"pod":"d"},"dt_txt":"2017-11-10 15:00:00"},{"dt":1510336800,"main":{"temp":13.46,"temp_min":13.46,"temp_max":13.46,"pressure":993.2,"sea_level":1031.77,"grnd_level":993.2,"humidity":90,"temp_kf":0},"weather":[{"id":500,"main":"Rain","description":"light rain","icon":"10d"}],"clouds":{"all":48},"wind":{"speed":1.16,"deg":243.508},"rain":{"3h":0.09},"sys":{"pod":"d"},"dt_txt":"2017-11-10 18:00:00"}],"city":{"id":5375480,"name":"Mountain View","coord":{"lat":37.3861,"lon":-122.0839},"country":"US"}}
          */
         private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
-
 
             throws JSONException {
 
